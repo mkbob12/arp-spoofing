@@ -4,7 +4,7 @@
 
 #define MAC_ADDR_LEN 6 
 using namespace std; 
-EthArpPacket packet;
+
 
 void usage() {
 	printf("syntax : arp-spoof <interface> <sender ip 1> <target ip 1> [<sender ip 2> <target ip 2>...]\n");
@@ -20,23 +20,28 @@ int main(int argc, char* argv[]){
 
 
     // ======================== 초기설정 =============================
-    u_int8_t attacker_mac[6];
-    u_int8_t sender_mac[6];
-    u_int8_t target_mac[6];
-    u_int8_t broad_mac[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
-    u_int8_t empty_mac[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
+    char attacker_mac[MAC_ADDR_LEN  * 3 + 1] = {0,};
+    char sender_mac[MAC_ADDR_LEN  * 3 + 1] = {0,};
+    char target_mac[MAC_ADDR_LEN  * 3 + 1] = {0,};
+    char broad_mac[] = "ff:ff:ff:ff:ff:ff"; 
+    char empty_mac[MAC_ADDR_LEN  * 3 + 1] = {0,};
 
-    char attacker_ip[INET_ADDRSTRLEN]; 
-    u_int8_t sender_ip[4];
-    u_int8_t target_ip[4];
+    char sender_ip[INET_ADDRSTRLEN];
+    char target_ip[INET_ADDRSTRLEN];
+    char attacker_ip[INET_ADDRSTRLEN];
 
     char *interface = argv[1];
-    -
 
     // =================== Get attacker mac, ip address ==========================
-    get_mac_address(interface, attacker_mac);
+    
+    uint8_t attacker_mac_temp[6];
+    get_mac_address(string(argv[1]), attacker_mac_temp);
+    to_hex_string(attacker_mac_temp, MAC_ADDR_LEN, attacker_mac);
+
+    cout << "atacker mac 주소 "<< attacker_mac << endl;
 
     get_ip_address(interface, attacker_ip);
+    std::cout << "attacker ip 주소" << "IP Address: " << attacker_ip << std::endl;
 
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(interface,BUFSIZ,1,1,errbuf);

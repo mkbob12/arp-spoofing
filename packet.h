@@ -20,6 +20,8 @@
 #include <regex>
 #include "string.h"
 
+
+
 using namespace std;
 
 
@@ -32,7 +34,7 @@ struct EthArpPacket final {
 #pragma pack(pop)
 
 
-int request(pcap_t* pcap, char* interface, u_int8_t *broad_mac,u_int8_t *attacker_mac, char *attacker_ip, u_int8_t *empty_mac, u_int8_t *target_ip, string type);
-int reply(pcap_t* pcap,  char* interface, u_int8_t *target_mac, u_int8_t *target_ip);
+int request(pcap_t* pcap, char* interface, char *broad_mac,char *attacker_mac, char *attacker_ip, char *empty_mac, char *target_ip, string type);
+int reply(pcap_t* pcap,  char* interface, char *target_mac, char *target_ip);
 
 // int relay();

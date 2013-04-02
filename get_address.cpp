@@ -1,19 +1,28 @@
 #include "get_address.h"
 
+
 #define MAC_ADDR_LEN 6 
 
-int get_mac_address(char* argv, uint8_t* mac_addr) {
+int get_mac_address(const std::string& if_name, uint8_t *mac_addr_buf)
+{
+   
+    
+	string mac_addr;
+	ifstream iface("/sys/class/net/" + if_name + "/address");
+	string str((istreambuf_iterator<char>(iface)), istreambuf_iterator<char>());
 
-    uint8_t temp_mac[6];
+	if(str.length() > 0){
+		string hex = regex_replace(str, regex(":"),"");
+		uint64_t result = stoull(hex,0,16);
+		for(int i =0; i < MAC_ADDR_LEN; i++){
+			mac_addr_buf[i] = (uint8_t) ((result & ((uint64_t) 0xFF << (i * 8))) >> (i * 8));
+		}
 
-    snprintf(reinterpret_cast<char*>(mac_addr), MAC_ADDR_LEN * 3, "%02X:%02X:%02X:%02X:%02X:%02X",
-        temp_mac[5], temp_mac[4], temp_mac[3], temp_mac[2], temp_mac[1], temp_mac[0]);
+		return -1;
+	}
 
-    std::string formatted_mac(reinterpret_cast<char*>(mac_addr));
 
-    std::cout << "MAC Address: " << formatted_mac << std::endl;
-
-    return -1;
+	return -1;
 }
 
 int get_ip_address(char *interface, char *attacker_ip){
@@ -40,9 +49,19 @@ int get_ip_address(char *interface, char *attacker_ip){
 
     sin = reinterpret_cast<struct sockaddr_in*>(&ifr.ifr_addr);
     inet_ntop(AF_INET, &(sin->sin_addr), attacker_ip, INET_ADDRSTRLEN);
- 
-
+   
     close(sockfd);
     return -1;
 
+}
+
+void to_hex_string(const unsigned char* bytes, size_t len, char* output) {
+    const char* hex = "0123456789ABCDEF";
+    for (size_t i = 0; i < len; ++i) {
+        unsigned char b = bytes[i];
+        output[i * 3] = hex[(b >> 4) & 0xF];
+        output[i * 3 + 1] = hex[b & 0xF];
+        output[i * 3 + 2] = ':';
+    }
+    output[len * 3 - 1] = '\0';
 }

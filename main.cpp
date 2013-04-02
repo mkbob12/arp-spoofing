@@ -51,13 +51,25 @@ int main(int argc, char* argv[]){
 		return -1;
 	}    
 
-   
-    string type;
     
+    // sender_mac 주소 알아오기 
+    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip,"request"); // target_mac 주소 알아오기 
+    reply(handle, interface, target_mac, target_ip);
+    
+    // target_mac 주소 알아오기 
+    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip, "request");// sender_mac 주소 알아오기 
+    reply(handle, interface, target_mac, target_ip); 
 
-    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip, type);// gateway_mac request (attacekr -> gateway)
-    reply(handle, interface, target_mac, target_ip); // reply : target_mac , target_ip 
-    //reqeust(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip,request)
+    // target_mac 주소 알아오기 
+    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip, "reply");// gateway_mac request (attacekr -> gateway)
+    reply(handle, interface, target_mac, target_ip); 
+
+    // target_mac 주소 알아오기 
+    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip, "reply");// gateway_mac request (attacekr -> gateway)
+    reply(handle, interface, target_mac, target_ip); 
+
+
+
     // reply()
 
     // relay()

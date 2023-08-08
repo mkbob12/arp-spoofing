@@ -1,5 +1,5 @@
 #include "main.h"
-#include "get_mac.h"
+#include "get_address.h"
 #include "ip.h"
 
 #define MAC_ADDR_LEN 6 
@@ -25,12 +25,16 @@ int main(int argc, char* argv[]){
     u_int8_t target_mac[6];
     u_int8_t broad_mac[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
 
-    u_int8_t attacker_ip[4];
+    char attacker_ip[INET_ADDRSTRLEN]; 
     u_int8_t sender_ip[4];
     u_int8_t target_ip[4];
 
     char *interface = argv[1];
     get_mac_address(interface, attacker_mac);
+
+    get_ip_address(interface, attacker_ip);
+
+    cout << attacker_ip << endl;
 
 
 

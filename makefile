@@ -3,7 +3,7 @@ LDLIBS=-lpcap
 all: arp-spoof
 
 
-arp-spoof: main.o arphdr.o ethhdr.o ip.o mac.o get_address.o
+arp-spoof: main.o arphdr.o ethhdr.o ip.o mac.o get_address.o packet.o
 	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 clean:

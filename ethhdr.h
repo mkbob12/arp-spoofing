@@ -4,6 +4,7 @@
 #include "mac.h"
 
 #pragma pack(push, 1)
+
 struct EthHdr final {
 	Mac dmac_;
 	Mac smac_;
@@ -20,5 +21,6 @@ struct EthHdr final {
 		Ip6 = 0x86DD
 	};
 };
+
 typedef EthHdr *PEthHdr;
 #pragma pack(pop)

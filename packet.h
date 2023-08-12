@@ -34,8 +34,8 @@ struct EthArpPacket final {
 #pragma pack(pop)
 
 
-int request(pcap_t* pcap, char* interface, char *broad_mac,char *attacker_mac, char *attacker_ip, char *empty_mac, char *target_ip, string type);
-int reply(pcap_t* pcap,  char* interface, char *target_mac, char *target_ip);
-int argv_to_ip(char* target_ip,char *argv[2]);
+int request(pcap_t* pcap, char* interface, char* broad_mac,char* attacker_mac, char* attacker_ip, char* empty_mac, char* target_ip, string type);
+int reply(pcap_t* pcap,   char *interface,  char *ip,  char *mac);
+int argv_to_ip(char *target_ip,char *argv[2]);
 
 // int relay();

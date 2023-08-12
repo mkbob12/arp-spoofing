@@ -1,5 +1,7 @@
 #include "packet.h"
 
+
+
 int request(pcap_t* handle, char* interface, char *broad_mac, char *attacker_mac, char *attacker_ip, char *empty_mac, char *target_ip, string type)
 {
     EthArpPacket packet;
@@ -15,16 +17,9 @@ int request(pcap_t* handle, char* interface, char *broad_mac, char *attacker_mac
 
         packet.arp_.hln_ = Mac::SIZE;
         packet.arp_.pln_ = Ip::SIZE;
-
-        
-        //memcpy(packet.arp_.smac_, (void*)attacker_mac, 6);
-        //memcpy(packet.arp_.smac_, static_cast<void*>(attacker_mac), 6);
         
         packet.arp_.smac_ = Mac(attacker_mac);
         packet.arp_.sip_ = htonl(Ip(attacker_ip)); 
-
-       
-        //memcpy(packet.arp_.tmac_, (void*)empty_mac, 4);
        
         packet.arp_.tmac_ = Mac(empty_mac);
         packet.arp_.tip_ = htonl(Ip(target_ip)); 
@@ -38,6 +33,31 @@ int request(pcap_t* handle, char* interface, char *broad_mac, char *attacker_mac
     }
 
     if(type == "reply"){
+
+        packet.eth_.dmac_ = Mac(broad_mac);
+        packet.eth_.smac_ = Mac(attacker_mac);
+        packet.eth_.type_ = htons(EthHdr::Arp);
+
+        packet.arp_.hrd_ = htons(ArpHdr::ETHER);
+        packet.arp_.pro_ = htons(EthHdr::Ip4);
+        packet.arp_.op_ = htons(ArpHdr::Reply);
+
+        packet.arp_.hln_ = Mac::SIZE;
+        packet.arp_.pln_ = Ip::SIZE;
+
+        
+        packet.arp_.smac_ = Mac(attacker_mac);
+        packet.arp_.sip_ = htonl(Ip(attacker_ip)); 
+       
+        packet.arp_.tmac_ = Mac(empty_mac);
+        packet.arp_.tip_ = htonl(Ip(target_ip)); 
+
+        int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
+
+        if(res !=0 ){
+            fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
+        }
+
 
     }
 

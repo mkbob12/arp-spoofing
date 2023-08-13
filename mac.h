@@ -15,6 +15,7 @@ struct Mac final {
 	Mac(const Mac& r) { memcpy(this->mac_, r.mac_, SIZE); }
 	Mac(const uint8_t* r) { memcpy(this->mac_, r, SIZE); }
 	Mac(const std::string& r);
+	Mac(const char* r);
 
 	// assign operator
 	Mac& operator = (const Mac& r) { memcpy(this->mac_, r.mac_, SIZE); return *this; }

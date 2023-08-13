@@ -23,18 +23,21 @@ int main(int argc, char* argv[]){
 
 
     // ======================== 초기설정 =============================
+
     char attacker_mac[18] = {0,};
     char sender_mac[18] = {0,};
     char target_mac[18] = {0,};
     char broad_mac[18] = {0,};
     char empty_mac[18] = {0,};
 
+
     strcpy(broad_mac, "ff:ff:ff:ff:ff:ff");
     strcpy(empty_mac, "00:00:00:00:00:00");
 
-    char sender_ip[20];
+     sender_ip[20];
     char target_ip[20];
     char attacker_ip[20];
+
 
     char *interface = argv[1];
 
@@ -47,7 +50,7 @@ int main(int argc, char* argv[]){
     cout << "attacker mac 주소 "<< attacker_mac << endl;
 
     get_ip_address(interface, attacker_ip);
-    std::cout << "attacker ip 주소" << "IP Address: " << attacker_ip << std::endl;
+    std::cout << "attacker ip 주소" <<  attacker_ip << std::endl;
 
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(interface,BUFSIZ,1,1,errbuf);
@@ -59,6 +62,7 @@ int main(int argc, char* argv[]){
     strcpy(sender_ip, argv[2]);
     strcpy(target_ip, argv[3]);
 
+<<<<<<< HEAD
     // sender_mac 주소 알아오기 
     EthArpPacket * arppacket = new EthArpPacket;
     arppacket = arprequest(handle, broad_mac,attacker_mac,attacker_ip,empty_mac, target_ip); // target_mac 주소 알아오기 

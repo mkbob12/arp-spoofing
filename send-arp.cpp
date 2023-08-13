@@ -1,4 +1,3 @@
-
 #include <cstdio>
 #include <pcap.h>
 #include<fstream>
@@ -250,6 +249,7 @@ int main(int argc, char* argv[]) {
 
 	packet.arp_.tmac_ = Mac(dst_mac);
 	packet.arp_.tip_ = htonl(Ip(argv[2]));
+	cout << packet.arp_.tip_ << endl;
 
 
 	int ras = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
